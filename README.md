@@ -1,0 +1,2 @@
+# flexible
+For all

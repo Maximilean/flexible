@@ -1,13 +1,20 @@
 import pygame
 from random import randint, randrange
+from win32api import GetSystemMetrics
+from PyQt5.QtWidgets import QApplication
+
+
+app = QApplication([])
+app.quit()
+
 
 FPS = 64
-width = 1200
-height = 700
-h_size = 40 # Горизонтальный размер объекта
-v_size = 40 # Вертикаьный размер объекта
+width = GetSystemMetrics(0) # Ширина экрана
+height = GetSystemMetrics(1) # Высота экрана
+h_size = 50 # Горизонтальный размер объекта
+v_size = 50 # Вертикаьный размер объекта
 a = 0.35 # Ускорение
-N = 2 # Кол-во экземпляров каждого элемента
+N = 6 # Кол-во экземпляров каждого элемента
 
 
 interval = 100 # Радиус интервала без ускорения
@@ -17,6 +24,8 @@ BLACK = (0, 0, 0)
 
 class Sq(pygame.sprite.Sprite):
     """Класс для квадратов"""
+
+
     def __init__(self, picture):
         pygame.sprite.Sprite.__init__(self)
         self.image_orig = picture
@@ -28,8 +37,8 @@ class Sq(pygame.sprite.Sprite):
         self.rect = self.rect.move(randint(-10, 10), randint(-10, 10))
         self.ax = 0
         self.ay = 0
-        self.speed_x = randrange(-1, 2, 2) * randint(2, 8)
-        self.speed_y = randrange(-1, 2, 2) * randint(2, 8)
+        self.speed_x = randrange(-1, 2, 2) * randint(2, 14)
+        self.speed_y = randrange(-1, 2, 2) * randint(2, 14)
         self.rot = 0
         self.rot_speed = randrange(-8, 8)
         self.last_update = pygame.time.get_ticks()
@@ -49,6 +58,7 @@ class Sq(pygame.sprite.Sprite):
 
 
     def update(self):
+        '''Обновление картинки'''
         self.rotate()
         self.rect.y += int(self.speed_y)
         self.rect.x += int(self.speed_x)
@@ -72,11 +82,12 @@ class Sq(pygame.sprite.Sprite):
 
 
 pygame.init()
-screen = pygame.display.set_mode((width, height))
+screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
 pygame.display.set_caption("Amimation")
 
 clock = pygame.time.Clock()
 
+# Загрузка всех изображений
 white_sq = pygame.image.load('IMG/Белый.png').convert()
 red_sq = pygame.image.load('IMG/Красный.png').convert()
 blue_sq = pygame.image.load('IMG/Синий.png').convert()
@@ -88,6 +99,9 @@ elements = [white_sq, red_sq, blue_sq, yellow_sq, green_sq, orange_sq]
 
 all_sprites = pygame.sprite.Group()
 
+print(width, height)
+
+# Создание экземпляров класса
 for element in elements:
     for i in range(N):
         body = Sq(element)
@@ -96,11 +110,15 @@ for element in elements:
 finish = False
 
 while not finish:
+    '''Основной цикл'''
     clock.tick(FPS)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finish = True
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                finish = True
 
     screen.fill(BLACK)
     all_sprites.update()
